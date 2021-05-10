@@ -31,23 +31,24 @@ const con = mysql.createConnection({
 
 //? TUNNEL LOCALHOST TO WEB //
 
-(async () => {
-  const tunnel = await localtunnel({
-    port: 4545,
-    subdomain: process.env.LT_SUBDOMAIN,
-  });
-  tunnel.url;
-  console.info(tunnel.url);
-  tunnel.on("close", () => {
-    console.log("Tunnel closed");
-  });
-})();
+// (async () => {
+//   const tunnel = await localtunnel({
+//     port: 4545,
+//     subdomain: process.env.LT_SUBDOMAIN,
+//   });
+//   tunnel.url;
+//   console.info(tunnel.url);
+//   tunnel.on("close", () => {
+//     console.log("Tunnel closed");
+//   });
+// })();
 
 const server = app.listen(4545, () => {
   let host = server.address().address;
   let port = server.address().port;
   console.log(`Started on PORT ${port}`);
 });
+
 
 //? ESTABLISH CONNECTION TO DATABASE //
 
@@ -63,6 +64,7 @@ let sqltest =
   con.escape(CURRENT_TIMESTAMP) +
   ",'1', '0')";
 
+
 //* FETCH LIST OF All USERS //
 
 app.get("/api/users", (req, res) => {
@@ -74,10 +76,10 @@ app.get("/api/users", (req, res) => {
           rows.map(
             (user) =>
               `<li style=\"list-style:none\"><strong style=\"color:blue\">Email address:</strong> ${user.email_address}</li>
-      <li style=\"list-style:none\"><strong style=\"color:blue\">Phone number:</strong> ${user.phone_number}</li>
-      <li style=\"list-style:none\"><strong style=\"color:blue\">Creation date:</strong> ${user.created}</li>
-      <li style=\"list-style:none\"><strong style=\"color:blue\">Premium:</strong> ${user.premium}</li>
-      <li style=\"list-style:none\"><strong style=\"color:blue\">Verified:</strong> ${user.verified}</li>`
+               <li style=\"list-style:none\"><strong style=\"color:blue\">Phone number:</strong> ${user.phone_number}</li>
+               <li style=\"list-style:none\"><strong style=\"color:blue\">Creation date:</strong> ${user.created}</li>
+               <li style=\"list-style:none\"><strong style=\"color:blue\">Premium:</strong> ${user.premium}</li>
+               <li style=\"list-style:none\"><strong style=\"color:blue\">Verified:</strong> ${user.verified}</li>`
           ) +
           "</ul>"
       );
@@ -89,7 +91,6 @@ app.get("/api/users", (req, res) => {
 app.get("/", (req, res) => {
   res.send(`<h1>Welcome to TOWINGO 😀</h1><a href="/api/users">View users<a/>`);
 });
-
 
 
 async function isEmailValid(email) {
@@ -200,7 +201,7 @@ app.post("/api/send-sms/", async function (req, res, next) {
       .catch((err) => console.log(err));
   
   }
-  return res.send(from + to + msg);
+  return res.send("Message sent successfully !");
 });
 
 //* GENERATE OTP TOKEN //
@@ -256,3 +257,28 @@ app.patch("/api/edituser/:id", async function (req, res, next) {
     }
   });
 })
+// * Get List of Vehicle vendors
+app.get("/api/vendors", (req, res) => {
+  con.query("select * from car2dbmakes", (error, rows, fields) => {
+    if (error) console.log("users query error:" + error);
+    else {
+      // res.send(
+      //   "<ul>" +
+      //     rows.map(
+      //       (vendor) =>`<li style=\"list-style:none\"><strong style=\"color:blue\">Name:</strong> ${vendor.title}</li>`) +
+      //     "</ul>" );
+      res.send(rows);
+    }
+  });
+});
+
+// * Get List of Vehicle vendor models
+app.get("/api/models/:maker", (req, res) => {
+  const maker = req.params.maker
+  con.query(`select * from car2dbmodels where make_id = ${maker}`, (error, rows, fields) => {
+    if (error) console.log("users query error:" + error);
+    else {
+      res.send(rows);
+      }
+  });
+});
