@@ -1,0 +1,389 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a Towingo API documentation server.",
+    "version": "1.0.0",
+    "title": "Townigo API library",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "hammemi.amine@digit-r.net"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "apidev.towingo.co",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "user",
+      "description": "User realted webservices"
+    },
+    {
+      "name": "car",
+      "description": "Access car related informations"
+    },
+    {
+      "name": "authentification",
+      "description": "Operations about user"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Returns list of all registered users",
+        "description": "Displays records of all registered users informations",
+        "operationId": "getUsers",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/user/register": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Create a user account",
+        "description": "This can only be done by unregistered user.",
+        "operationId": "registerUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user infos object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Signup"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Email address is not valid"
+          },
+          "409": {
+            "description": "User already registered"
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "sign in registered user",
+        "description": "This can only be done by a registered in user.",
+        "operationId": "loginUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "user phone number",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Login"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No registered user found with the corresponding phone number"
+          },
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/user/infos": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get currently logged user infos",
+        "description": "This can only be done by a registered in user.",
+        "operationId": "GetUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "get user infos",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Infos"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/user/{userId}/edit": {
+      "patch": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Edit user infos",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "updateUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user that needs to be updated",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Updated user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/otp": {
+      "get": {
+        "tags": [
+          "authentification"
+        ],
+        "summary": "Generate a OTP token",
+        "description": "Generate OTP",
+        "operationId": "getOTP",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/send-sms": {
+      "post": {
+        "tags": [
+          "authentification"
+        ],
+        "summary": "Send OTP to user by sms",
+        "description": "This can only be done by a registered in user.",
+        "operationId": "sendSms",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "sms object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SMS"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/make": {
+      "get": {
+        "tags": [
+          "car"
+        ],
+        "summary": "get list of car makers around the world",
+        "description": "get car makers list",
+        "operationId": "getCarMake",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/car/models/{make}": {
+      "get": {
+        "tags": [
+          "car"
+        ],
+        "summary": "Retrieve all model names produced by the specified manufacturer",
+        "description": "get car makers models list",
+        "operationId": "getCarModels",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "make",
+            "in": "path",
+            "description": "car maker id, Use 10 for testing. ",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/car/add/{userId}": {
+      "post": {
+        "tags": [
+          "car"
+        ],
+        "summary": "Add car to user collection",
+        "description": "This can only be done by a registered in user.",
+        "operationId": "addCar",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "userId",
+            "description": "Id of car owner/ user",
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "object of car to be added",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Car"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Signup": {
+      "type": "object",
+      "properties": {
+        "phone_number": {
+          "type": "string"
+        },
+        "email_address": {
+          "type": "string",
+          "format": "email"
+        }
+      }
+    },
+    "Login": {
+      "type": "object",
+      "properties": {
+        "phone_number": {
+          "type": "string"
+        }
+      }
+    },
+    "Infos": {
+      "type": "object",
+      "properties": {
+        "phone_number": {
+          "type": "string"
+        }
+      }
+    },
+    "SMS": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "string"
+        },
+        "token": {
+          "type": "integer"
+        },
+        "expires": {
+          "type": "integer"
+        }
+      }
+    },
+    "Car": {
+      "type": "object",
+      "properties": {
+        "make_id": {
+          "type": "integer"
+        },
+        "model_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "DOB": {
+          "type": "string",
+          "format": "date"
+        },
+        "username": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female"
+          ]
+        }
+      }
+    }
+  }
+}
