@@ -15,6 +15,10 @@
   },
   "host": "apidev.towingo.co",
   "basePath": "/api",
+  "schemes": [
+    "http",
+    "https"
+  ],
   "tags": [
     {
       "name": "user",

@@ -1,9 +1,8 @@
 const express = require("express");
 const app = express();
 const mysql = require("mysql");
-const CURRENT_TIMESTAMP = require("moment-timezone")().format(
-  "YYYY-MM-DD hh:mm:ss"
-);
+const CURRENT_TIMESTAMP = require("moment-timezone")()
+.format(  "YYYY-MM-DD hh:mm:ss");
 const emailValidator = require("deep-email-validator");
 const localtunnel = require("localtunnel");
 require("dotenv").config();
@@ -14,20 +13,37 @@ var morgan = require("morgan");
 app.use(morgan("tiny"));
 
 app.use(express.json());
-app.use(
-  express.urlencoded({
+app.use(express.urlencoded({
     extended: true,
   })
 );
+
+//* enable cors on server //
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 
+//* CORS v2 *//
+// const util = require('util');
+// const createMiddleware = require('@apidevtools/swagger-express-middleware');
+
+// createMiddleware('swagger.json', app, function(err, middleware) {
+//   app.use(middleware.metadata());
+//   app.use(middleware.CORS());
+
+//   // Show the CORS headers as HTML
+//   app.use(function(req, res, next) {
+//       res.send('<pre>' + util.inspect(res._headers) + '</pre>');
+//   });
+
+
+// });
+
+//* Swagger UI */
+
 const swaggerUi = require('swagger-ui-express');
-
-
 const swaggerDocument = require('./swagger.json');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -41,19 +57,18 @@ const con = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-//? TUNNEL LOCALHOST TO WEB //
-
-(async () => {
-  const tunnel = await localtunnel({
-    port: 4545,
-    subdomain: process.env.LT_SUBDOMAIN,
-  });
-  tunnel.url;
-  console.info(tunnel.url);
-  tunnel.on("close", () => {
-    console.log("Tunnel closed");
-  });
-})();
+// //? TUNNEL LOCALHOST TO WEB //
+// (async () => {
+//   const tunnel = await localtunnel({
+//     port: 4545,
+//     subdomain: process.env.LT_SUBDOMAIN,
+//   });
+//   tunnel.url;
+//   console.info(tunnel.url);
+//   tunnel.on("close", () => {
+//     console.log("Tunnel closed");
+//   });
+// })();
 
 const server = app.listen(4545, () => {
   let host = server.address().address;
@@ -61,18 +76,8 @@ const server = app.listen(4545, () => {
   console.log(`🚀 Started on PORT ${port}`);
 });
 
-//* LOG REQUEST PERFORMANCES *//
-const getDurationInMilliseconds = (start) => {
-  const NS_PER_SEC = 1e9
-  const NS_TO_MS = 1e6
-  const diff = process.hrtime(start)
 
-  return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS
-}
-
-
-
-//? ESTABLISH CONNECTION TO DATABASE // 
+//? CONNECT TO DATABASE // 
 
 con.connect((err) => {
   if (err) console.log("Database Connection Error:", err.code);
@@ -93,53 +98,7 @@ app.get("/api/users", (req, res) => {
   con.query("select * from users", (error, rows, fields) => {
     if (error) console.log("users query error:" + error);
     else {
-      //res.send(
-      //   `<style>
-      //   table {
-      //     border-collapse: collapse;
-      //     border: 2px solid rgb(200, 200, 200);
-      //     letter-spacing: 1px;
-      //     font-family: sans-serif;
-      //     font-size: .8rem;
-      // }
-      
-      // td,
-      // th {
-      //     border: 1px solid rgb(190, 190, 190);
-      //     padding: 5px 10px;
-      // }
-      
-      // td {
-      //     text-align: center;
-      // }
-      
-      // </style>
-      // <table>
-      //     <thead>
-      //         <tr>
-      //             <th>id</th>
-      //             <th>E-mail address</th>
-      //             <th>Phone Number</th>
-      //             <th>Created</th>
-      //             <th>Premium</th>
-      //             <th>Premium</th>
-      //         </tr>
-      //     </thead>
-      //     <tbody>
-      //         <tr>` +
-      //     rows.map(
-      //       (user) =>
-      //         `<tr>
-      //         <td>${user.id}</td>
-      //         <td>${user.email_address}</td>
-      //         <td>${user.phone_number}</td>
-      //         <td>${user.created}</td>
-      //         <td>${user.premium}</td>
-      //         <td>${user.verified}</td>
-  
-      //     </tr>`)+`</tbody> </table> `
-      // );
-       res.send(rows);
+      res.send(rows);
     }
   });
 });
@@ -323,11 +282,6 @@ app.get("/api/make", (req, res) => {
   con.query("select * from car2dbmakes", (error, rows, fields) => {
     if (error) console.log("users query error:" + error);
     else {
-      // res.send(
-      //   "<ul>" +
-      //     rows.map(
-      //       (vendor) =>`<li style=\"list-style:none\"><strong style=\"color:blue\">Name:</strong> ${vendor.title}</li>`) +
-      //     "</ul>" );
       res.send(rows);
     }
   });
