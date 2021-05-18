@@ -10,7 +10,7 @@ require("dotenv").config();
 //* Log queries with morgan 
 
 var morgan = require("morgan");
-app.use(morgan("tiny"));
+app.use(morgan("combined"));
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -58,17 +58,17 @@ const con = mysql.createConnection({
 });
 
 // //? TUNNEL LOCALHOST TO WEB //
-// (async () => {
-//   const tunnel = await localtunnel({
-//     port: 4545,
-//     subdomain: process.env.LT_SUBDOMAIN,
-//   });
-//   tunnel.url;
-//   console.info(tunnel.url);
-//   tunnel.on("close", () => {
-//     console.log("Tunnel closed");
-//   });
-// })();
+(async () => {
+  const tunnel = await localtunnel({
+    port: 4545,
+    subdomain: process.env.LT_SUBDOMAIN,
+  });
+  tunnel.url;
+  console.info(tunnel.url);
+  tunnel.on("close", () => {
+    console.log("Tunnel closed");
+  });
+})();
 
 const server = app.listen(4545, () => {
   let host = server.address().address;
@@ -167,7 +167,7 @@ const registerUser = async (email_address, phone_number, res) => {
 
 //* REGISTER A NEW USER //
 
-app.post("/api/user/register/", async function (req, res, next) {
+app.post("/api/user/register", async function (req, res, next) {
   const { email_address, phone_number } = req.body;
 
   const { valid, reason, validators } = await isEmailValid(email_address);
@@ -182,7 +182,7 @@ app.post("/api/user/register/", async function (req, res, next) {
 
 //* Log existing USER //
 
-app.post("/api/user/login/", async function (req, res, next) {
+app.post("/api/user/login", async function (req, res, next) {
   const { phone_number } = req.body;
 
   let fetchPhone =
@@ -204,7 +204,7 @@ const accountSid = process.env.TWL_accountSid;
 const authToken = process.env.TWL_authToken;
 const client = require("twilio")(accountSid, authToken);
 
-app.post("/api/send-sms/", async function (req, res, next) {
+app.post("/api/send-sms", async function (req, res, next) {
   const { to,token,expires } = req.body;
 
   if (!to)
@@ -278,7 +278,7 @@ app.patch("/api/user/:id/edit", async function (req, res, next) {
   });
 })
 // * Get List of Vehicle make
-app.get("/api/make", (req, res) => {
+app.get("/api/car/make", (req, res) => {
   con.query("select * from car2dbmakes", (error, rows, fields) => {
     if (error) console.log("users query error:" + error);
     else {
@@ -299,12 +299,12 @@ app.get("/api/car/models/:make", (req, res) => {
 });
 
 // * Get List of cars owned by user
-app.get("/api/cars/:user", (req, res) => {
-  const user = req.params.user
+app.get("/api/cars/:userId", (req, res) => {
+  const user_id = req.params.userId
   con.query(`select car2dbmakes.make_name, car2dbmodels.model_name, isdefault from user_cars inner join car2dbmakes on
   user_cars.make_id = car2dbmakes.make_id 
   inner join car2dbmodels on user_cars.model_id = car2dbmodels.model_id
-  where user_cars.user_id = ${user} order by user_cars.car_id asc `, (error, rows, fields) => {
+  where user_cars.user_id = ${user_id} order by user_cars.car_id asc `, (error, rows, fields) => {
     if (error) console.log("users query error:" + error);
     else {
       res.send(rows);
@@ -313,9 +313,9 @@ app.get("/api/cars/:user", (req, res) => {
 });
 
 //*Add a new user car *//
-app.post("/api/car/add/:user", async function (req, res, next) {
+app.post("/api/car/add/:userId", async function (req, res, next) {
   let {make_id, model_id} = req.body;
-  let user_id = req.params.user
+  let user_id = req.params.userId
   con.query( `INSERT INTO user_cars (make_id, model_id, user_id, isdefault,car_id) VALUES (${make_id},${model_id},${user_id},false,NULL)`, (err, result) => {
     if (err) return "DB fetch user failed" + err;
         if (err) {

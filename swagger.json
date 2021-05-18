@@ -127,7 +127,7 @@
         ],
         "summary": "Get currently logged user infos",
         "description": "This can only be done by a registered in user.",
-        "operationId": "GetUser",
+        "operationId": "GetUserInfos",
         "produces": [
           "application/json"
         ],
@@ -144,6 +144,33 @@
         ],
         "responses": {
           "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/user/cars": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Returns list of all cars owned by user",
+        "description": "Returns list of all cars owned by user",
+        "operationId": "getUserCars",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of cars owner id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
             "description": "successful operation"
           }
         }
@@ -166,7 +193,7 @@
             "in": "path",
             "description": "Id of user that needs to be updated",
             "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "in": "body",
@@ -233,7 +260,7 @@
         }
       }
     },
-    "/make": {
+    "/car/make": {
       "get": {
         "tags": [
           "car"
@@ -269,7 +296,7 @@
             "in": "path",
             "description": "car maker id, Use 10 for testing. ",
             "required": true,
-            "type": "string"
+            "type": "integer"
           }
         ],
         "responses": {
@@ -296,7 +323,7 @@
             "required": true,
             "name": "userId",
             "description": "Id of car owner/ user",
-            "type": "string"
+            "type": "integer"
           },
           {
             "in": "body",
